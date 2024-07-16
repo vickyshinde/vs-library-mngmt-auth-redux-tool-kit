@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './authSlice';
+import booksReducer from './booksSlice';
 import Cookies from 'js-cookie';
 
 // Load the state from cookies
@@ -28,6 +29,7 @@ const saveState = (state) => {
 const store = configureStore({
   reducer: {
     auth: authReducer,
+    books: booksReducer,
   },
   preloadedState: {
     auth: loadState(),

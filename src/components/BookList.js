@@ -1,24 +1,28 @@
 import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-
-const books = [
-  { id: 1, title: 'Book One', summary: 'Summary of book one' },
-  { id: 2, title: 'Book Two', summary: 'Summary of book two' },
-  // Add more books as needed
-];
+import { deleteBook } from '../rtk/booksSlice';
 
 const BookList = () => {
+  const books = useSelector((state) => state.books);
+  const dispatch = useDispatch();
+
+  const handleDelete = (id) => {
+    dispatch(deleteBook(id));
+  };
+
   return (
     <div>
-      <h2>Book List</h2>
+      <h1>Book List</h1>
       <ul>
         {books.map((book) => (
           <li key={book.id}>
-            <Link to={`/books/${book.id}`}>{book.title}</Link>
+            <Link to={`/books/${book.id}`}>{book.name}</Link>
+            <button onClick={() => handleDelete(book.id)}>Delete</button>
           </li>
         ))}
       </ul>
-      <Link to="/">Back</Link>
+      <button onClick={() => window.history.back()}>Back</button>
     </div>
   );
 };

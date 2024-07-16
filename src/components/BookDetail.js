@@ -1,21 +1,20 @@
 import React from 'react';
-import { useParams, Link } from 'react-router-dom';
-
-const books = [
-  { id: 1, title: 'Book One', summary: 'Summary of book one' },
-  { id: 2, title: 'Book Two', summary: 'Summary of book two' },
-  // Add more books as needed
-];
+import { useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 const BookDetail = () => {
   const { id } = useParams();
-  const book = books.find((book) => book.id === parseInt(id));
+  const book = useSelector((state) => state.books.find((book) => book.id === parseInt(id)));
+
+  if (!book) {
+    return <p>Book not found</p>;
+  }
 
   return (
     <div>
-      <h2>{book.title}</h2>
+      <h1>{book.name}</h1>
       <p>{book.summary}</p>
-      <Link to="/books">Back</Link>
+      <button onClick={() => window.history.back()}>Back</button>
     </div>
   );
 };
