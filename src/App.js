@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import SignIn from './components/SignIn';
 import BookList from './components/BookList';
 import BookDetail from './components/BookDetail';
-import { signOut } from './rtk/authSlice';
+import { signOut } from './rtk/authSlice';import Cookies from 'js-cookie';
 
 const RequireAuth = ({ children }) => {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
@@ -14,6 +14,11 @@ const RequireAuth = ({ children }) => {
 const App = () => {
   const dispatch = useDispatch();
   const auth = useSelector((state) => state.auth);
+
+  const handleSignOut = () => {
+    dispatch(signOut());
+    Cookies.remove('auth');
+  };
 
   return (
     <Router>
@@ -33,7 +38,7 @@ const App = () => {
         {auth.isAuthenticated && (
           <div>
             <p>Welcome, {auth.user.username}</p>
-            <button onClick={() => dispatch(signOut())}>Sign Out</button>
+            <button onClick={handleSignOut}>Sign Out</button>
           </div>
         )}
         
@@ -60,7 +65,5 @@ const App = () => {
     </Router>
   );
 };
-
-
 
 export default App;
