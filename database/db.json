@@ -1,0 +1,6 @@
+{
+  "books": [
+    { "id": 1, "name": "Book 1", "summary": "Summary of Book 1" },
+    { "id": 2, "name": "Book 2", "summary": "Summary of Book 2" }
+  ]
+}
