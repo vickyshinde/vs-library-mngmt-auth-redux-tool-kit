@@ -1,34 +1,49 @@
-// src/BookList.js
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { addBook, deleteBook } from '../rtk/booksSlice';
+import { fetchBooks, deleteBookFromAPI } from '../rtk/booksSlice';
+import BookForm from './BookForm';
 
 const BookList = () => {
-  const books = useSelector((state) => state.books);
+  // Selectors
+  const books = useSelector((state) => state.books.items);
+  const status = useSelector((state) => state.books.status);
+  const error = useSelector((state) => state.books.error);
+
+  // Dispatcher
   const dispatch = useDispatch();
-  const [newBook, setNewBook] = useState({ name: '', summary: '' });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setNewBook({ ...newBook, [name]: value });
-  };
+  // State
+  const [editingBook, setEditingBook] = useState(null);
 
-  const handleAddBook = (e) => {
-    e.preventDefault();
-    if (newBook.name && newBook.summary) {
-      const newBookWithId = { ...newBook, id: books.length + 1 };
-      dispatch(addBook(newBookWithId));
-      setNewBook({ name: '', summary: '' });
-    } else {
-      alert('Please fill in both fields');
+  // Fetch books on component mount
+  useEffect(() => {
+    if (status === 'idle') {
+      dispatch(fetchBooks());
     }
+  }, [status, dispatch]);
+
+  // Handle edit book
+  const handleEdit = (book) => {
+    setEditingBook(book);
   };
 
-  const handleDelete = (id) => {
-    dispatch(deleteBook(id));
+  // Handle delete book
+  const handleDelete = (bookId) => {
+    dispatch(deleteBookFromAPI(bookId));
   };
 
+  // Render loading state
+  if (status === 'loading') {
+    return <div>Loading...</div>;
+  }
+
+  // Render error state
+  if (status === 'failed') {
+    return <div>{error}</div>;
+  }
+
+  // Render book list
   return (
     <div>
       <h1>Book List</h1>
@@ -36,27 +51,12 @@ const BookList = () => {
         {books.map((book) => (
           <li key={book.id}>
             <Link to={`/books/${book.id}`}>{book.name}</Link>
+            <button onClick={() => handleEdit(book)}>Edit</button>
             <button onClick={() => handleDelete(book.id)}>Delete</button>
           </li>
         ))}
       </ul>
-      <form onSubmit={handleAddBook}>
-        <input
-          type="text"
-          name="name"
-          placeholder="Book Name"
-          value={newBook.name}
-          onChange={handleChange}
-        />
-        <input
-          type="text"
-          name="summary"
-          placeholder="Book Summary"
-          value={newBook.summary}
-          onChange={handleChange}
-        />
-        <button type="submit">Add Book</button>
-      </form>
+      <BookForm book={editingBook} setEditingBook={setEditingBook} />
       <button onClick={() => window.history.back()}>Back</button>
     </div>
   );

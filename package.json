@@ -24,8 +24,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "json-server": "json-server --watch database/db.json --port 3030",
-    "dev-api": "concurrently \"vite\" \"json-server --watch database/db.json --port 3030\""
+    "json-server": "json-server --watch database/db.json --port 3131",
+    "dev-api": "concurrently \"PORT=3030 react-scripts start\" \"json-server --watch database/db.json --port 3131\""
   },
   "eslintConfig": {
     "extends": [
