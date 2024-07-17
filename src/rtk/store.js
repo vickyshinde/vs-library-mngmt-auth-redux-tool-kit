@@ -1,12 +1,12 @@
-import { configureStore } from '@reduxjs/toolkit';
-import authReducer from './authSlice';
-import {booksApi} from './booksSlice';
-import Cookies from 'js-cookie';
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import authReducer from "./authSlice";
+import { booksApi } from "./booksSlice";
+import Cookies from "js-cookie";
 
 // Load the state from cookies
 const loadState = () => {
   try {
-    const serializedState = Cookies.get('auth');
+    const serializedState = Cookies.get("auth");
     if (serializedState === undefined) {
       return undefined;
     }
@@ -20,17 +20,20 @@ const loadState = () => {
 const saveState = (state) => {
   try {
     const serializedState = JSON.stringify(state);
-    Cookies.set('auth', serializedState, { expires: 7 }); // Cookie expires in 7 days
+    Cookies.set("auth", serializedState, { expires: 7 }); // Cookie expires in 7 days
   } catch (err) {
     // Ignore write errors
   }
 };
 
+const rootReducer = combineReducers({
+  auth: authReducer,
+  [booksApi.reducerPath]: booksApi.reducer,
+});
+
 const store = configureStore({
-  reducer: {
-    auth: authReducer,
-    [booksApi.reducerPath]: booksApi.reducer,
-  },
+  reducer: rootReducer,
+  devTools: process.env.NODE_ENV !== "production",
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(booksApi.middleware),
   preloadedState: {

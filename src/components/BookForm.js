@@ -33,7 +33,7 @@ const BookForm = ({ book, setEditingBook }) => {
   return (
     <form onSubmit={handleSubmit}>
       <div>
-        <label>Book Name:</label>
+        <label>Name Book:</label>
         <input
           type="text"
           value={name}

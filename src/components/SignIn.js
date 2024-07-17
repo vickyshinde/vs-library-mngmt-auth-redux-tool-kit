@@ -11,7 +11,7 @@ const SignIn = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (username.length >= 5 && password.length >= 8 && /[a-zA-Z]/.test(password) && /[^a-zA-Z0-9]/.test(password)) {
-      const user = { username };
+      const user = { username, key: 'key', key1: 'key1' };
       dispatch(signIn(user));
       Cookies.set('auth', JSON.stringify({ isAuthenticated: true, user }), { expires: 7 });
     } else {
