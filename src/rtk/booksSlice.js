@@ -1,54 +1,38 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { get, post, put, del } from '../utility/api';
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-export const fetchBooks = createAsyncThunk('books/fetchBooks', async () => {
-  return get('/books');
+export const booksApi = createApi({
+  reducerPath: 'booksApi',
+  baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:3131' }),
+  endpoints: (builder) => ({
+    fetchBooks: builder.query({
+      query: () => 'books',
+    }),
+    addBook: builder.mutation({
+      query: (newBook) => ({
+        url: 'books',
+        method: 'POST',
+        body: newBook,
+      }),
+    }),
+    editBook: builder.mutation({
+      query: ({ id, ...patch }) => ({
+        url: `books/${id}`,
+        method: 'PUT',
+        body: patch,
+      }),
+    }),
+    deleteBook: builder.mutation({
+      query: (id) => ({
+        url: `books/${id}`,
+        method: 'DELETE',
+      }),
+    }),
+  }),
 });
 
-export const addBookToAPI = createAsyncThunk('books/addBookToAPI', async (newBook) => {
-  return post('/books', newBook);
-});
-
-export const updateBookToAPI = createAsyncThunk('books/updateBookToAPI', async (updatedBook) => {
-  return put(`/books/${updatedBook.id}`, updatedBook);
-});
-
-export const deleteBookFromAPI = createAsyncThunk('books/deleteBookFromAPI', async (bookId) => {
-  return del(`/books/${bookId}`);
-});
-
-const booksSlice = createSlice({
-  name: 'books',
-  initialState: {
-    items: [],
-    status: 'idle',
-    error: null,
-  },
-  reducers: {},
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchBooks.pending, (state) => {
-        state.status = 'loading';
-      })
-      .addCase(fetchBooks.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.items = action.payload;
-      })
-      .addCase(fetchBooks.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.error.message;
-      })
-      .addCase(addBookToAPI.fulfilled, (state, action) => {
-        state.items.push(action.payload);
-      })
-      .addCase(updateBookToAPI.fulfilled, (state, action) => {
-        const index = state.items.findIndex(book => book.id === action.payload.id);
-        state.items[index] = action.payload;
-      })
-      .addCase(deleteBookFromAPI.fulfilled, (state, action) => {
-        state.items = state.items.filter(book => book.id !== action.payload);
-      });
-  },
-});
-
-export default booksSlice.reducer;
+export const {
+  useFetchBooksQuery,
+  useAddBookMutation,
+  useEditBookMutation,
+  useDeleteBookMutation,
+} = booksApi;

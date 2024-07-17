@@ -1,61 +1,54 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { addBookToAPI, updateBookToAPI } from '../rtk/booksSlice';
+import React, { useState, useEffect } from 'react';
+import { useAddBookMutation, useEditBookMutation } from '../rtk/booksSlice';
 
 const BookForm = ({ book, setEditingBook }) => {
-  const [formData, setFormData] = useState({ name: '', summary: '' });
-  const dispatch = useDispatch();
+  const [name, setName] = useState(book?.name || '');
+  const [userId, setUserId] = useState(book?.userId || '');
+  const [addBook] = useAddBookMutation();
+  const [editBook] = useEditBookMutation();
 
   useEffect(() => {
     if (book) {
-      setFormData({ name: book.name, summary: book.summary });
+      setName(book.name);
+      setUserId(book.userId);
     }
   }, [book]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.name && formData.summary) {
+    try {
       if (book) {
-        dispatch(updateBookToAPI({ ...book, ...formData }));
-        setEditingBook(null);
+        await editBook({ id: book.id, name, userId });
       } else {
-        const newBookWithId = { ...formData, id: Date.now() };
-        dispatch(addBookToAPI(newBookWithId));
+        await addBook({ name, userId });
       }
-      setFormData({ name: '', summary: '' });
-    } else {
-      alert('Please fill in both fields');
+      setName('');
+      setUserId('');
+      setEditingBook(null);
+    } catch (err) {
+      console.error('Failed to save the book: ', err);
     }
-  };
-
-  const handleCancel = () => {
-    setEditingBook(null);
-    setFormData({ name: '', summary: '' });
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <input
-        type="text"
-        name="name"
-        placeholder="Book Name"
-        value={formData.name}
-        onChange={handleChange}
-      />
-      <input
-        type="text"
-        name="summary"
-        placeholder="Book Summary"
-        value={formData.summary}
-        onChange={handleChange}
-      />
-      <button type="submit">{book ? 'Update' : 'Add'}</button>
-      {book && <button type="button" onClick={handleCancel}>Cancel</button>}
+      <div>
+        <label>Book Name:</label>
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+      </div>
+      <div>
+        <label>User ID:</label>
+        <input
+          type="text"
+          value={userId}
+          onChange={(e) => setUserId(e.target.value)}
+        />
+      </div>
+      <button type="submit">{book ? 'Update' : 'Add'} Book</button>
     </form>
   );
 };
