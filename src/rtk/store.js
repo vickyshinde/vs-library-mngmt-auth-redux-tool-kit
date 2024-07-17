@@ -1,7 +1,15 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import authReducer from "./authSlice";
+import { createLogger } from "redux-logger";
 import { booksApi } from "./booksSlice";
+import authReducer from "./authSlice";
 import Cookies from "js-cookie";
+
+// Create the logger middleware
+const logger = createLogger({
+  level: 'info',
+  collapsed: true,
+});
+
 
 // Load the state from cookies
 const loadState = () => {
@@ -31,11 +39,18 @@ const rootReducer = combineReducers({
   [booksApi.reducerPath]: booksApi.reducer,
 });
 
+const middleware = (getDefaultMiddleware) => {
+  // console.log("🚀 ~ middleware ~ process.env.NODE_ENV:", process.env.NODE_ENV)
+  if (process.env.NODE_ENV !== 'production') {
+    return getDefaultMiddleware().concat(booksApi.middleware, logger);
+  }
+  return getDefaultMiddleware().concat(booksApi.middleware);
+};
+
 const store = configureStore({
   reducer: rootReducer,
   devTools: process.env.NODE_ENV !== "production",
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(booksApi.middleware),
+  middleware,
   preloadedState: {
     auth: loadState(),
   },

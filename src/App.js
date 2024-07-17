@@ -12,6 +12,8 @@ const RequireAuth = ({ children }) => {
 };
 
 const App = () => {
+  console.log("🚀 ~ middleware ~ process.env.REACT_APP_KEY:", process.env.REACT_APP_KEY)
+
   const dispatch = useDispatch();
   const auth = useSelector((state) => state.auth);
 
