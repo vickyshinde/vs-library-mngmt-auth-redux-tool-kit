@@ -5,11 +5,28 @@ import authReducer from "./authSlice";
 import Cookies from "js-cookie";
 
 // Create the logger middleware
-const logger = createLogger({
-  level: 'info',
-  collapsed: true,
-});
 
+const logger = createLogger({
+  level: "info",
+  collapsed: true,
+
+  // to show the difference between what changed in state
+  diff: true,
+  
+  // to log time
+  duration: true,
+  timestamp: true,
+
+  // custom colors for each log
+  colors: {
+    title: () => "#0f1842",
+    prevState: () => "#de6f0d",
+    action: () => "#6e13ab",
+    nextState: () => "#1a9134",
+  },
+});
+// Custom logger
+// https://javascript.plainenglish.io/redux-logger-your-next-debugging-tool-the-art-of-logging-e1999cbbd146
 
 // Load the state from cookies
 const loadState = () => {
@@ -41,7 +58,7 @@ const rootReducer = combineReducers({
 
 const middleware = (getDefaultMiddleware) => {
   // console.log("🚀 ~ middleware ~ process.env.NODE_ENV:", process.env.NODE_ENV)
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== "production") {
     return getDefaultMiddleware().concat(booksApi.middleware, logger);
   }
   return getDefaultMiddleware().concat(booksApi.middleware);
